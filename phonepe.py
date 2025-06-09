@@ -214,7 +214,6 @@ if page == "home":
     filtered_df = df[df["State"] == selected_state]
     # Group to avoid collapsing
     grouped_df = filtered_df.groupby("Year")["Registered_Users"].sum().reset_index()
-   
     # Plot
     fig = px.line(
     grouped_df,
@@ -224,7 +223,6 @@ if page == "home":
     title=f"Registered Users Trend for {selected_state}",
     labels={"Year": "Year", "Registered_Users": "Registered Users"}
     )
-
     fig.update_layout(
     yaxis_title="Registered Users (in Millions)",
     yaxis=dict(
@@ -364,8 +362,7 @@ elif page == "analytics":
 
     brand_summary = df1.groupby('Brand')['Transaction_count'].sum().reset_index()
     top_5_brands = brand_summary.sort_values(by='Transaction_count', ascending=False).head(10)
-
-    
+ 
     fig3= px.bar(
         top_5_brands,
         x='Brand',
@@ -375,12 +372,10 @@ elif page == "analytics":
         text='Transaction_count'
     )
     
- 
-    
     fig3.update_traces(texttemplate='%{text:.2s}', textposition='outside')
     fig3.update_layout(xaxis_title='Device Brand', yaxis_title='Total Transaction Count')
 
-    st.write(f"Top Performing  Districts in PhonePe Transaction {selected_state}")
+    st.write(f"Top 10 Device Brands by Transaction Count on {selected_state}")
     st.plotly_chart(fig3, use_container_width=True) 
 
     # Ensure percentage column is numeric
@@ -407,7 +402,7 @@ elif page == "analytics":
     fig4.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
     fig4.update_layout(xaxis_title='Device Brand', yaxis_title='Avg. Transaction %')
     
-    st.write(f"Top Performing  Districts in PhonePe Transaction {selected_state}")
+    st.write(f"Top 5 Device Brands by Growth Percentage on {selected_state}")
     st.plotly_chart(fig4, use_container_width=True) 
     
 elif page == "reports":
@@ -419,9 +414,7 @@ elif page == "reports":
     df["State"] = df["State"].replace(state_name_map)
     # Calculate growth rate (Quater-over-Quater) per state
     df['Growth_Rate (%)'] = df.groupby('State')['Transacion_amount'].pct_change() * 100
-
-    # Streamlit app
-    st.subheader("Transaction Volume and Growth Rate by State and Quater")
+   
  
     # Optional: Filter to only latest quarter per state
     latest_quarter_df = df.sort_values("Quater").groupby("State").tail(1)
@@ -440,9 +433,10 @@ elif page == "reports":
     )
     fig.update_traces(texttemplate="%{text:.2f}", textposition="outside")
     fig.update_layout(yaxis_title=metric)
-
+    st.write("Transaction Volume and Growth Rate by State and Quater")
     st.plotly_chart(fig, use_container_width=True)
-    st.subheader("📈 Category-wise Transaction Performance")
+
+
 
     df = df.rename(columns={
     "Transacion_type": "Transaction_type",
@@ -454,7 +448,7 @@ elif page == "reports":
     filtered_df = df[df["State"] == selected_state]
     
     # PIE CHART — Transaction Amount Share by Type
-    st.subheader(f"💰 Transaction Amount Share in  ")
+    st.subheader(f"Transaction Amount Share in {selected_state} ")
     fig_pie = px.pie(
         filtered_df,
         names='Transaction_type',
