@@ -71,7 +71,7 @@ PHONEPE_PLUSE_ANALYZER/
 
 git clone https://github.com/JeevaVedha/Phonepe_Pluse_Analyzer.git
 
-cd PhonePe-Transaction-Insights
+cd Phonepe_Pluse_Analyzer
 
 ### 7.2. Install Required Packages
 
@@ -101,18 +101,18 @@ streamlit run phonepe.py
 
 # 9. Sample Visualizations
 ## 9.1. Choropleth Maps
-        ![alt text](image.png)
+        ![Map Screenshot](image/Screenshots_Map.png)
 
 ## 9.2.Bar & Line Charts
-        ![alt text](image-1.png)
+        ![Bar Screenshot](image/Screenshots_bar.png)
 
-        ![alt text](image-2.png)
+        ![Trend Screenshot](image/Screenshots_Trend.png)
 
-## 9.3.Tabels
-        ![alt text](image-3.png)
+## 9.3.Tables
+        ![Table Screenshot](image/Screenshots_table.png)
 
 ## 9.4.Interactive Drop-down and Slider Filters
-        ![alt text](image-4.png)
+        ![Dropdown Screenshot](image/Screenshots_Dropdown.png)
         
 
 # 10. Analysis Insights
