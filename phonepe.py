@@ -136,7 +136,7 @@ page = st.query_params.get("page", "home")
 
 
 if page == "home":
-    st.title("Home - User Registration Analysis")
+    st.title("1.User Registration Analysis")
     st.write(" Visualize user registration intensity across India with a dynamic map showing state-wise adoption over time by year and quarter.")
     # Load your PhonePe data
     df = pd.read_csv("C:/Users/Jeeva/Documents/PhonePepluse/Phonepe_Pluse_Analyzer/Data_Extract/Map_user.csv")
@@ -233,7 +233,9 @@ if page == "home":
      )
     )
     st.subheader(f"📈 Yearly Registration Trend in {selected_state}")
+    st.write("Track registration trends over time by year for the selected state.")
     st.plotly_chart(fig, use_container_width=True) 
+
 
     # Dropdown Filters Year and Quarter
     col1, col2 = st.columns(2)
@@ -276,33 +278,250 @@ if page == "home":
     # Show side-by-side tables
     
     st.subheader(f"🔼 Top 5 Growing Districts ({prev_year} Q{prev_quarter} → {current_year} Q{current_quarter})")
+    st.write("Discover the top 5 districts codes based on registration volume, growth, and growth percentage.")
     st.dataframe(top5[['District', 'Previous_Users', 'Current_Users', 'Growth', 'Growth_Percent']])
     
     st.subheader(f"🔽 Bottom 5 Shrinking Districts ({prev_year} Q{prev_quarter} → {current_year} Q{current_quarter})")
+    st.write("Discover the Bottom  5 districts codes based on registration volume, growth, and growth percentage.")
     st.dataframe(bottom5[['District', 'Previous_Users', 'Current_Users', 'Growth', 'Growth_Percent']])
-    
-    
-
-  
+     
 elif page == "analytics":
-    st.write("Analytics section here.")
+    st.subheader("2.Transaction Performance Analysis Across Indian States and Districts")
    
+    df = pd.read_csv("C:/Users/Jeeva/Documents/PhonePepluse/Phonepe_Pluse_Analyzer/Data_Extract/Map_transaction.csv")
+    df["Year"] = pd.to_numeric(df["Year"], errors="coerce")
+    df["State"] = df["State"].replace(state_name_map)
+    df['District'] = df['District'].str.upper()
+
+    selected_state = st.selectbox("Select State", sorted(df["State"].unique()))
+    filtered_df = df[df["State"] == selected_state] 
+    district_summary = (
+    filtered_df.groupby("District")[["Transaction_amount", "Transaction_count"]]
+    .sum()
+    .reset_index()
+    .sort_values(by="Transaction_amount", ascending=False)
+    .head(10)
+    )
+
+    fig = px.bar(
+        district_summary,
+        x="District",
+        y="Transaction_amount",
+        text="Transaction_amount",
+         
+        title=f"Top 10 Districts in {selected_state}",
+        labels={"Transaction_amount": "Transaction Amount (₹)", "District": "District"},
+        color_discrete_sequence=["#5F259F"]
+     )
+    fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
+    fig.update_layout(
+        xaxis_title="District",
+        yaxis_title="Transaction Amount",
+        uniformtext_minsize=8,
+        uniformtext_mode='hide',
+        plot_bgcolor="#f9f9f9"
+    )
+    st.write(f"Top Performing  Districts in PhonePe Transaction {selected_state}")
+    st.plotly_chart(fig, use_container_width=True)
+
+    state_df = df[df["State"] == selected_state]
+    yearly_growth = state_df.groupby("Year")[["Transaction_amount", "Transaction_count"]].sum().reset_index()
+   
+    st.subheader(f"📈 Growth Trend of Transaction Amount in {selected_state}")
+
+    fig2 = px.line(
+        yearly_growth,
+        x="Year",
+        y="Transaction_amount",
+        markers=True,
+        text="Transaction_amount",
+        title=f"Yearly Transaction Growth in {selected_state}",
+        labels={"Transaction_amount": "Transaction Amount (₹)", "Year": "Year"},
+    )
+    fig2.update_traces(
+        text=df["Transaction_amount"],
+        texttemplate="%{text:.2s}",    # ✅ SI format (like 1.2B)
+        textposition="top center",
+        line=dict(color="royalblue", width=3),
+        marker=dict(color="royalblue", size=8))
+   
+    fig2.update_layout(
+        yaxis_title="Transaction Amount (₹)",
+        xaxis_title="Year",
+        plot_bgcolor="#f9f9f9",
+        
+    )
+
+    st.plotly_chart(fig2, use_container_width=True) 
+
+
+    st.subheader("3. Device Dominance and User Engagement Analysis")
+    df1 = pd.read_csv("C:/Users/Jeeva/Documents/PhonePepluse/Phonepe_Pluse_Analyzer/Data_Extract/Aggregated_user.csv")
+    df1["Year"] = pd.to_numeric(df1["Year"], errors="coerce")
+    df1["State"] = df1["State"].replace(state_name_map)
+     
+    df1['Brand'] = df1['Brand'].str.upper()
+
+    brand_summary = df1.groupby('Brand')['Transaction_count'].sum().reset_index()
+    top_5_brands = brand_summary.sort_values(by='Transaction_count', ascending=False).head(10)
+
+    
+    fig3= px.bar(
+        top_5_brands,
+        x='Brand',
+        y='Transaction_count',
+        title='Top 10 Device Brands by Transaction Count',
+        color='Brand',
+        text='Transaction_count'
+    )
+    
+ 
+    
+    fig3.update_traces(texttemplate='%{text:.2s}', textposition='outside')
+    fig3.update_layout(xaxis_title='Device Brand', yaxis_title='Total Transaction Count')
+
+    st.write(f"Top Performing  Districts in PhonePe Transaction {selected_state}")
+    st.plotly_chart(fig3, use_container_width=True) 
+
+    # Ensure percentage column is numeric
+    df1['Transaction_percentage'] = pd.to_numeric(df1['Transaction_percentage'], errors='coerce')
+
+    # Group by Brand and calculate the average transaction percentage
+    avg_percentage_by_brand = df1.groupby('Brand')['Transaction_percentage'].mean().reset_index()
+
+    # Sort to get the top 5 brands by average percentage
+    top_5_percentage_brands = avg_percentage_by_brand.sort_values(by='Transaction_percentage', ascending=False).head(5)
+
+    # Display the result
+   
+
+    # Optional: Visualize as bar chart
+    fig4 = px.bar(
+        top_5_percentage_brands,
+        x='Brand',
+        y='Transaction_percentage',
+        title='Top 5 Device Brands by Average Transaction Percentage',
+        color='Brand',
+        text='Transaction_percentage'
+    )
+    fig4.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig4.update_layout(xaxis_title='Device Brand', yaxis_title='Avg. Transaction %')
+    
+    st.write(f"Top Performing  Districts in PhonePe Transaction {selected_state}")
+    st.plotly_chart(fig4, use_container_width=True) 
+    
+elif page == "reports":
+    st.subheader("4.Decoding Transaction Dynamics on PhonePe")
     df = pd.read_csv("C:/Users/Jeeva/Documents/PhonePepluse/Phonepe_Pluse_Analyzer/Data_Extract/Aggregated_transaction.csv")
-    # UI for filtering
-    states = sorted(df['State'].unique()) 
+     
+    # Sort by State and Quater to ensure correct ordering
+    df = df.sort_values(by=['State', 'Quater'])
+    df["State"] = df["State"].replace(state_name_map)
+    # Calculate growth rate (Quater-over-Quater) per state
+    df['Growth_Rate (%)'] = df.groupby('State')['Transacion_amount'].pct_change() * 100
+
+    # Streamlit app
+    st.subheader("Transaction Volume and Growth Rate by State and Quater")
+ 
+    # Optional: Filter to only latest quarter per state
+    latest_quarter_df = df.sort_values("Quater").groupby("State").tail(1)
+
+    # Select metric to visualize
+    metric = st.selectbox("Select metric to visualize", ["Transacion_amount", "Growth_Rate (%)"])
+
+    fig = px.bar(
+        latest_quarter_df,
+        x="State",
+        y=metric,
+        color=metric,
+        text=metric,
+        title=f"{metric} in Latest Quater",
+        color_continuous_scale="Viridis"
+    )
+    fig.update_traces(texttemplate="%{text:.2f}", textposition="outside")
+    fig.update_layout(yaxis_title=metric)
+
+    st.plotly_chart(fig, use_container_width=True)
+    st.subheader("📈 Category-wise Transaction Performance")
+
+    df = df.rename(columns={
+    "Transacion_type": "Transaction_type",
+    "Transacion_amount": "Transaction_amount",
+    "Transacion_count": "Transaction_count",
+    "Quater": "Quarter"  # Also fix this one
+    })
+    selected_state = st.selectbox("Select State", sorted(df["State"].unique()))
+    filtered_df = df[df["State"] == selected_state]
+    
+    # PIE CHART — Transaction Amount Share by Type
+    st.subheader(f"💰 Transaction Amount Share in  ")
+    fig_pie = px.pie(
+        filtered_df,
+        names='Transaction_type',
+        values='Transaction_amount',
+        hole=0.4,
+        title='Transaction Amount Distribution by Type'
+    )
+    st.plotly_chart(fig_pie, use_container_width=True)
+
+    df1 = pd.read_csv("C:/Users/Jeeva/Documents/PhonePepluse/Phonepe_Pluse_Analyzer/Data_Extract/Top_insurance.csv")
+    # Clean and prepare data
+    df1["State"] = df1["State"].replace(state_name_map)
+    df1["Transaction_Amount"] = pd.to_numeric(df1["Transaction_Amount"], errors='coerce')
+    df1["Quarter"] = df1["Quarter"].astype(str)
+    df1["Year_Quarter"] = df1["Year"].astype(str) + " Q" + df1["Quarter"]
+
+    # Filters
+    
     col1, col2 = st.columns(2)
     with col1:
-        selected_states = st.selectbox("Select State", states)
-    # Filter the dataframe
-    filtered_df = df[(df['Year'] == selected_states) ]
+        years = sorted(df1["Year"].unique(), reverse=True)
+        selected_year = st.selectbox("Select Year", years)
+    with col2:
+        quarters = sorted(df1[df1["Year"] == selected_year]["Quarter"].unique(), key=int, reverse=True)
+        selected_quarter = st.selectbox("Select Quarter", quarters)
     
-    # If Registered_Users contains commas, remove them and convert to int
-    filtered_df["State"] = df["State"].astype(str).str.replace(",", "").astype(int) 
-     
-    filtered_df['State'] = filtered_df['State'].map(state_name_map) 
+    # Define current and previous period
+    current_period = f"{selected_year} Q{selected_quarter}"
+    if int(selected_quarter) > 1:
+        previous_period = f"{selected_year} Q{int(selected_quarter) - 1}"
+    else:
+        previous_period = f"{selected_year - 1} Q4"
 
-elif page == "reports":
-    st.write("Reports section here.")
+    # Filter data
+    df_current = df1[df1["Year_Quarter"] == current_period].copy()
+    df_previous = df1[df1["Year_Quarter"] == previous_period].copy()
+
+    # Group and aggregate
+    current_group = df_current.groupby("State")["Transaction_Amount"].sum().reset_index(name="Transaction_Amount")
+    previous_group = df_previous.groupby("State")["Transaction_Amount"].sum().reset_index(name="Previous_Amount")
+
+    # Merge and calculate
+    summary_df = pd.merge(current_group, previous_group, on="State", how="left")
+
+    total_amount = summary_df["Transaction_Amount"].sum()
+    summary_df["Share %"] = (summary_df["Transaction_Amount"] / total_amount * 100).round(2)
+    summary_df["Growth"] = (summary_df["Transaction_Amount"] - summary_df["Previous_Amount"]).fillna(0).round(2)
+    summary_df["Growth %"] = ((summary_df["Growth"] / summary_df["Previous_Amount"]) * 100).replace([float("inf"), -float("inf")], 0).fillna(0).round(2)
+
+    # Sort and rename
+    summary_df = summary_df.sort_values(by="Transaction_Amount", ascending=False)
+    summary_df.rename(columns={
+        "Transaction_Amount": "Volume (₹)",
+        "Previous_Amount": "Previous Volume (₹)"
+    }, inplace=True)
+
+
+    # Display in Streamlit
+    st.subheader(f"📋 Insurance Transaction Summary by State - {current_period}")
+    st.dataframe(summary_df.style.format({
+        "Volume (₹)": lambda x: f"₹{x/1_000_000:.2f}M",
+        "Previous Volume (₹)": lambda x: f"₹{x/1_000_000:.2f}M",
+        "Share %": "{:.2f}%",
+        "Growth": lambda x: f"₹{x/1_000_000:.2f}M",
+        "Growth %": "{:.2f}%"
+    }), use_container_width=True)
+    
 elif page == "settings":
     st.write("Settings page here.")
 
