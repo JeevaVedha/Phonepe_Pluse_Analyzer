@@ -126,8 +126,8 @@ Category-Wise Transaction Distribution
 
 Device-Based Usage Trends
 
-### Future Improvements
-11. Future Improvements
+
+# 11. Future Improvements
 Integrate live API to auto-refresh data.
 
 Add advanced filters and forecasting models.
