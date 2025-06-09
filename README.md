@@ -101,7 +101,7 @@ streamlit run phonepe.py
 
 # 9. Sample Visualizations
 ## 9.1. Choropleth Maps
-        ![Map Screenshot](image/Screenshots_Map.png)
+        ![Choropleth Map Screenshot](image/Screenshots_Map.png)
 
 ## 9.2.Bar & Line Charts
         ![Bar Screenshot](image/Screenshots_bar.png)
