@@ -100,21 +100,14 @@ streamlit run phonepe.py
 
 
 # 9. Sample Visualizations
-## 9.1. Choropleth Maps
-        ![Choropleth Map Screenshot](image/Screenshots_Map.png)
+    9.1. Choropleth Maps
 
-## 9.2.Bar & Line Charts
-        ![Bar Screenshot](image/Screenshots_bar.png)
+    9.2.Bar & Line Charts
 
-        ![Trend Screenshot](image/Screenshots_Trend.png)
-
-## 9.3.Tables
-        ![Table Screenshot](image/Screenshots_table.png)
-
-## 9.4.Interactive Drop-down and Slider Filters
-        ![Dropdown Screenshot](image/Screenshots_Dropdown.png)
+    9.3.Tables
         
-
+    9.4.Interactive Drop-down and Slider Filters
+        
 # 10. Analysis Insights
 Top & Bottom Performing Regions
 
