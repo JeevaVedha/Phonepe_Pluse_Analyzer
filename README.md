@@ -71,28 +71,27 @@ PHONEPE_PLUSE_ANALYZER/
 ├── .gitignore
 ├── LICENSE
 
----
+```  
 
 ## 8. ⚙️ Setup Instructions
 
 ### 8.1. Clone the Repository
 
-```bash
 git clone https://github.com/JeevaVedha/Phonepe_Pluse_Analyzer.git
 cd Phonepe_Pluse_Analyzer
 
 ### 8.2. Install Required Packages
 
-```bash
+
 pip install -r requirements.txt
 
 ### 8.3. Load Data into PostgreSQL
-```bash
+
 Update your DB credentials in db_load.py and run:
 python db_load.py
 
 ### 8.4. Launch Streamlit Dashboard
-```bash
+
 streamlit run phonepe.py
 
 ## 9. 🚀 Key Features
@@ -115,7 +114,7 @@ streamlit run phonepe.py
 
 🎛️ Interactive Dropdowns & Sliders
 
-11. 🔍 Analysis Insights
+## 11. 🔍 Analysis Insights
 🚀 Top & Bottom Performing Regions
 
 📊 Growth Trends by Quarter
