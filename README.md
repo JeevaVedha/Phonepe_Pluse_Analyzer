@@ -49,8 +49,9 @@ Top Data: Rankings of top-performing regions
 Transformation: Raw JSON ➝ Cleaned CSV using custom Python scripts.
 
 
-# 6. Project Structure
+# 6 Project Structure
 
+```plaintext
 PHONEPE_PLUSE_ANALYZER/
 ├── data/
 │   └── Data_Extract/                  # CSV files derived from raw JSON
@@ -64,6 +65,7 @@ PHONEPE_PLUSE_ANALYZER/
 ├── README.md                          # This file
 ├── .gitignore
 ├── LICENSE
+
 
 
 # 7.  Setup Instructions
