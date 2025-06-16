@@ -235,54 +235,71 @@ if page == "home":
     st.plotly_chart(fig, use_container_width=True) 
 
 
-    # Dropdown Filters Year and Quarter
+    # --- Dropdown filters: State, Year & Quarter ---
+    states = sorted(df['State'].dropna().unique().tolist())
+    years = sorted(df['Year'].unique().tolist())
+    quarters = sorted(df['Quarter'].unique().tolist())
+
+    # 1. State filter
+    current_state = st.selectbox("Select State", ["All"] + states, index=0)
+
+    # 2. Year & Quarter filters side by side
     col1, col2 = st.columns(2)
     with col1:
-        current_year = st.selectbox("Select Year", years,index=len(years)-1)
+        current_year = st.selectbox("Select Year", years, index=len(years)-1)
     with col2:
-        current_quarter = st.selectbox("Select Quarter",  quarters,index=len(quarters)-1)
+        current_quarter = st.selectbox("Select Quarter", quarters, index=len(quarters)-1)
 
-
-    # Logic to compute previous quarter and year
+    # Compute previous quarter/year
     if current_quarter == 1:
         prev_quarter = 4
         prev_year = current_year - 1
     else:
         prev_quarter = current_quarter - 1
         prev_year = current_year
-    # Filter data
-    current_df = df[(df['Year'] == current_year) & (df['Quarter'] == current_quarter)]
-    prev_df = df[(df['Year'] == prev_year) & (df['Quarter'] == prev_quarter)]
-    # Group by District
-    current_group = current_df.groupby('District')['Registered_Users'].sum().reset_index()
-    prev_group = prev_df.groupby('District')['Registered_Users'].sum().reset_index()
-    # Rename columns
-    current_group.rename(columns={'Registered_Users': 'Current_Users'}, inplace=True)
-    prev_group.rename(columns={'Registered_Users': 'Previous_Users'}, inplace=True)
-    # Merge
-    merged = pd.merge(current_group, prev_group, on='District', how='outer').fillna(0)
-    # Compute Growth
+
+    # --- Filter data based on selections ---
+    filtered = df.copy()
+    if current_state != "All":
+        filtered = filtered[filtered['State'] == current_state]
+
+    # Split current and previous period
+    current_df = filtered[
+        (filtered['Year'] == current_year) & (filtered['Quarter'] == current_quarter)
+    ]
+    prev_df = filtered[
+        (filtered['Year'] == prev_year) & (filtered['Quarter'] == prev_quarter)
+    ]
+
+    # Group by district and compute activation sums
+    curr_grp = current_df.groupby('District')['Registered_Users'].sum().reset_index()
+    prev_grp = prev_df.groupby('District')['Registered_Users'].sum().reset_index()
+    prev_grp.rename(columns={'Registered_Users': 'Previous_Users'}, inplace=True)
+    curr_grp.rename(columns={'Registered_Users': 'Current_Users'}, inplace=True)
+
+    merged = pd.merge(curr_grp, prev_grp, on='District', how='outer').fillna(0)
     merged['Growth'] = merged['Current_Users'] - merged['Previous_Users']
     merged['Growth_Percent'] = merged.apply(
-        lambda row: (row['Growth'] / row['Previous_Users'] * 100) if row['Previous_Users'] > 0 else 0,
+        lambda r: (r['Growth'] / r['Previous_Users'] * 100) if r['Previous_Users'] > 0 else 0,
         axis=1
     )
-    # Format district names
+    
     merged['District'] = merged['District'].str.upper()
-    # Top 5
-    top5 = merged.sort_values(by='Growth', ascending=False).head(5).reset_index(drop=True)
-    # Bottom 5
-    bottom5 = merged.sort_values(by='Growth', ascending=True).head(5).reset_index(drop=True)
-    # Show side-by-side tables
-    
-    st.subheader(f"🔼 Top 5 Growing Districts ({prev_year} Q{prev_quarter} → {current_year} Q{current_quarter})")
-    st.write("Discover the top 5 districts codes based on registration volume, growth, and growth percentage.")
+
+    # Sort and pick top/bottom 5
+    top5 = merged.nlargest(5, 'Growth').reset_index(drop=True)
+    bottom5 = merged.nsmallest(5, 'Growth').reset_index(drop=True)
+
+    # --- Display results ---
+    subtitle = f"{prev_year} Q{prev_quarter} → {current_year} Q{current_quarter}"
+    if current_state != "All":
+        subtitle += f" for STATE: {current_state.upper()}"
+
+    st.subheader(f"🔼 Top 5 Growing Districts {subtitle}")
     st.dataframe(top5[['District', 'Previous_Users', 'Current_Users', 'Growth', 'Growth_Percent']])
-    
-    st.subheader(f"🔽 Bottom 5 Shrinking Districts ({prev_year} Q{prev_quarter} → {current_year} Q{current_quarter})")
-    st.write("Discover the Bottom  5 districts codes based on registration volume, growth, and growth percentage.")
+
+    st.subheader(f"🔽 Bottom 5 Shrinking Districts {subtitle}")
     st.dataframe(bottom5[['District', 'Previous_Users', 'Current_Users', 'Growth', 'Growth_Percent']])
-     
 elif page == "analytics":
     st.subheader("2.Transaction Performance Analysis Across Indian States and Districts")
    
