@@ -323,12 +323,13 @@ elif page == "analytics":
         x="District",
         y="Transaction_amount",
         text="Transaction_amount",
-         
+        
         title=f"Top 10 Districts in {selected_state}",
         labels={"Transaction_amount": "Transaction Amount (₹)", "District": "District"},
         color_discrete_sequence=["#5F259F"]
      )
     fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
+    
     fig.update_layout(
         xaxis_title="District",
         yaxis_title="Transaction Amount",
