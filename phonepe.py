@@ -339,12 +339,28 @@ elif page == "analytics":
     )
     st.write(f"Top Performing  Districts in PhonePe Transaction {selected_state}")
     st.plotly_chart(fig, use_container_width=True)
+    
 
+    selected_state = st.selectbox(
+        "Select a state:",
+        options=df["State"].unique(),
+        index=0
+    )
+
+    # Filter dataframe for only the selected state
     state_df = df[df["State"] == selected_state]
-    yearly_growth = state_df.groupby("Year")[["Transaction_amount", "Transaction_count"]].sum().reset_index()
-   
+
+    # Aggregate by Year
+    yearly_growth = (
+        state_df
+        .groupby("Year")[["Transaction_amount", "Transaction_count"]]
+        .sum()
+        .reset_index()
+    )
+
     st.subheader(f"📈 Growth Trend of Transaction Amount in {selected_state}")
 
+    # Plotly line chart
     fig2 = px.line(
         yearly_growth,
         x="Year",
@@ -352,76 +368,77 @@ elif page == "analytics":
         markers=True,
         text="Transaction_amount",
         title=f"Yearly Transaction Growth in {selected_state}",
-        labels={"Transaction_amount": "Transaction Amount (₹)", "Year": "Year"},
-    )
-    fig2.update_traces(
-        text=df["Transaction_amount"],
-        texttemplate="%{text:.2s}",    # ✅ SI format (like 1.2B)
-        textposition="top center",
-        line=dict(color="royalblue", width=3),
-        marker=dict(color="royalblue", size=8))
-   
-    fig2.update_layout(
-        yaxis_title="Transaction Amount (₹)",
-        xaxis_title="Year",
-        plot_bgcolor="#f9f9f9",
-        
+        labels={"Transaction_amount": "Transaction Amount (₹)", "Year": "Year"}
     )
 
-    st.plotly_chart(fig2, use_container_width=True) 
+    # Update traces and layout
+    fig2.update_traces(
+        texttemplate="%{text:.2s}",  # Compact SI format like 1.2B
+        textposition="top center",
+        line=dict(color="royalblue", width=3),
+        marker=dict(color="royalblue", size=8),
+    )
+
+    fig2.update_layout(
+        plot_bgcolor="#f9f9f9",
+        xaxis_title="Year",
+        yaxis_title="Transaction Amount (₹)",
+    )
+
+    st.plotly_chart(fig2, use_container_width=True)
 
 
     st.subheader("3. Device Dominance and User Engagement Analysis")
+
+    
     df1 = pd.read_csv("C:/Users/Jeeva/Documents/PhonePepluse/Phonepe_Pluse_Analyzer/Data_Extract/Aggregated_user.csv")
     df1["Year"] = pd.to_numeric(df1["Year"], errors="coerce")
     df1["State"] = df1["State"].replace(state_name_map)
-     
     df1['Brand'] = df1['Brand'].str.upper()
 
-    brand_summary = df1.groupby('Brand')['Transaction_count'].sum().reset_index()
-    top_5_brands = brand_summary.sort_values(by='Transaction_count', ascending=False).head(10)
- 
-    fig3= px.bar(
-        top_5_brands,
+    selected_state = st.selectbox(
+        "Select a state:",
+        options=sorted(df1["State"].unique())
+    )
+
+    # Filter for the selected state
+    state_df = df1[df1["State"] == selected_state]
+
+    # --- Top Device Brands by Transaction Count ---
+    brand_summary = state_df.groupby('Brand')['Transaction_count'].sum().reset_index()
+    top_10_brands = brand_summary.sort_values(by='Transaction_count', ascending=False).head(10)
+
+    fig3 = px.bar(
+        top_10_brands,
         x='Brand',
         y='Transaction_count',
-        title='Top 10 Device Brands by Transaction Count',
+        title=f'Top 10 Device Brands by Transaction Count in {selected_state}',
         color='Brand',
         text='Transaction_count'
     )
-    
     fig3.update_traces(texttemplate='%{text:.2s}', textposition='outside')
     fig3.update_layout(xaxis_title='Device Brand', yaxis_title='Total Transaction Count')
 
-    st.write(f"Top 10 Device Brands by Transaction Count on {selected_state}")
-    st.plotly_chart(fig3, use_container_width=True) 
+    st.plotly_chart(fig3, use_container_width=True)
 
-    # Ensure percentage column is numeric
-    df1['Transaction_percentage'] = pd.to_numeric(df1['Transaction_percentage'], errors='coerce')
 
-    # Group by Brand and calculate the average transaction percentage
-    avg_percentage_by_brand = df1.groupby('Brand')['Transaction_percentage'].mean().reset_index()
-
-    # Sort to get the top 5 brands by average percentage
+    # --- Top Device Brands by Average Transaction Percentage ---
+    state_df['Transaction_percentage'] = pd.to_numeric(state_df['Transaction_percentage'], errors='coerce')
+    avg_percentage_by_brand = state_df.groupby('Brand')['Transaction_percentage'].mean().reset_index()
     top_5_percentage_brands = avg_percentage_by_brand.sort_values(by='Transaction_percentage', ascending=False).head(5)
 
-    # Display the result
-   
-
-    # Optional: Visualize as bar chart
     fig4 = px.bar(
         top_5_percentage_brands,
         x='Brand',
         y='Transaction_percentage',
-        title='Top 5 Device Brands by Average Transaction Percentage',
+        title=f'Top 5 Device Brands by Avg. Transaction % in {selected_state}',
         color='Brand',
         text='Transaction_percentage'
     )
     fig4.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
     fig4.update_layout(xaxis_title='Device Brand', yaxis_title='Avg. Transaction %')
-    
-    st.write(f"Top 5 Device Brands by Growth Percentage on {selected_state}")
-    st.plotly_chart(fig4, use_container_width=True) 
+
+    st.plotly_chart(fig4, use_container_width=True)
     
 elif page == "reports":
     st.subheader("4.Decoding Transaction Dynamics on PhonePe")
