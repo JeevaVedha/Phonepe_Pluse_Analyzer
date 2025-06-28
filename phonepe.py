@@ -431,14 +431,14 @@ elif page == "reports":
     df = df.sort_values(by=['State', 'Quater'])
     df["State"] = df["State"].replace(state_name_map)
     # Calculate growth rate (Quater-over-Quater) per state
-    df['Growth_Rate (%)'] = df.groupby('State')['Transacion_amount'].pct_change() * 100
+    df['Growth_Rate (%)'] = df.groupby('State')['Transaction_amount'].pct_change() * 100
    
  
     # Optional: Filter to only latest quarter per state
     latest_quarter_df = df.sort_values("Quater").groupby("State").tail(1)
 
     # Select metric to visualize
-    metric = st.selectbox("Select metric to visualize", ["Transacion_amount", "Growth_Rate (%)"])
+    metric = st.selectbox("Select metric to visualize", ["Transaction_amount", "Growth_Rate (%)"])
 
     fig = px.bar(
         latest_quarter_df,
@@ -457,9 +457,9 @@ elif page == "reports":
 
 
     df = df.rename(columns={
-    "Transacion_type": "Transaction_type",
-    "Transacion_amount": "Transaction_amount",
-    "Transacion_count": "Transaction_count",
+    "Transaction_type": "Transaction_type",
+    "Transaction_amount": "Transaction_amount",
+    "Transaction_count": "Transaction_count",
     "Quater": "Quarter"  # Also fix this one
     })
     selected_state = st.selectbox("Select State", sorted(df["State"].unique()))

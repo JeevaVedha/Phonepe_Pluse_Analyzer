@@ -1,4 +1,4 @@
-State,Year,Quater,Transacion_type,Transacion_count,Transacion_amount
+State,Year,Quater,Transaction_type,Transaction_count,Transaction_amount
 andaman-&-nicobar-islands,2018,1,Recharge & bill payments,4200,1845307.4673655091
 andaman-&-nicobar-islands,2018,1,Peer-to-peer payments,1871,12138655.299749982
 andaman-&-nicobar-islands,2018,1,Merchant payments,298,452507.168646613
